@@ -22,7 +22,6 @@ import { Text, View, FlatList, TouchableOpacity } from 'react-native';
  * Step 8: Feature to keep track of players wins and losses
  */
 
-
 const EMPTY_SYMBOL = '';
 const X_SYMBOL = 'X';
 const O_SYMBOL = 'O';
@@ -55,20 +54,20 @@ class GameBoard extends Component {
     isHorizontalComplete(r, c, symbol) {
         var isHorizontalComplete = true;
         // go forward
-        for (i = r; i < BOARD_SIZE - 1; i++) {
+        for (i = c; i < BOARD_SIZE; i++) {
             // if marked symbol is not equal to current symbol, 
             // then row is not complete 
-            const pos = getPositionFromRC(r, c);
+            const pos = getPositionFromRC(r, i);
             if (this.state.positions[pos] != symbol) {
                 isHorizontalComplete = false;
             }
         }
 
         // go back
-        for (i = r; i < 0 - 1; i--) {
+        for (i = c; i >= 0; i--) {
             // if marked symbol is not equal to current symbol, 
             // then row is not complete
-            const pos = getPositionFromRC(r, c);
+            const pos = getPositionFromRC(r, i);
             if (this.state.positions[pos] != symbol) {
                 isHorizontalComplete = false;
             }
@@ -78,38 +77,73 @@ class GameBoard extends Component {
     }
 
     isVerticalComplete(r, c, symbol) {
-        // Similar to isHorizontalComplete implementation,
-        // i = c
+        var isVerticalComplete = true;
+        // go forward
+        for (i = r; i < BOARD_SIZE; i++) {
+            // if marked symbol is not equal to current symbol, 
+            // then col is not complete 
+            const pos = getPositionFromRC(i, c);
+            if (this.state.positions[pos] != symbol) {
+                isVerticalComplete = false;
+            }
+        }
 
-        // go forward i++ in column and check if it is complete
-        // go forward i-- in column and check if it is complete
+        // go back
+        for (i = r; i >= 0; i--) {
+            // if marked symbol is not equal to current symbol, 
+            // then col is not complete
+            const pos = getPositionFromRC(i, c);
+            if (this.state.positions[pos] != symbol) {
+                isVerticalComplete = false;
+            }
+        }
+
+        return isVerticalComplete;
     }
 
     isDiagonalComplete(r, c, symbol) {
-        // Similar to isHorizontalComplete implementation,
-        // with i = r and j = c
-
         // go forward i++, j++ in row, column and check if it is complete
-        // go forward i--, j-- in row, column and check if it is complete
+        var isDiagonalComplete = true;
+
+        for (i = r, j = c; i < BOARD_SIZE, j < BOARD_SIZE; i++ , j++) {
+            // if marked symbol is not equal to current symbol, 
+            // then col is not complete 
+            const pos = getPositionFromRC(i, j);
+            if (this.state.positions[pos] != symbol) {
+                isDiagonalComplete = false;
+            }
+        }
+
+        // go back i--, j-- in row, column and check if it is complete
+        for (i = r, j = c; i >= 0, j >= 0; i-- , j--) {
+            // if marked symbol is not equal to current symbol, 
+            // then col is not complete
+            const pos = getPositionFromRC(i, j);
+            if (this.state.positions[pos] != symbol) {
+                isDiagonalComplete = false;
+            }
+        }
+
+        return isDiagonalComplete;
     }
 
     isWon() {
         // Check for X symbol
-        var h = isHorizontalComplete(0, 0, X_SYMBOL); 
-        var v = isVerticalComplete(0, 0, X_SYMBOL); 
+        var h = isHorizontalComplete(0, 0, X_SYMBOL);
+        var v = isVerticalComplete(0, 0, X_SYMBOL);
         var d = isDiagonalComplete(0, 0, X_SYMBOL);
         var x = h && v && d;
 
         // Check for O symbol
-        h = isHorizontalComplete(0, 0, O_SYMBOL); 
-        v = isVerticalComplete(0, 0, O_SYMBOL); 
+        h = isHorizontalComplete(0, 0, O_SYMBOL);
+        v = isVerticalComplete(0, 0, O_SYMBOL);
         d = isDiagonalComplete(0, 0, O_SYMBOL);
         var o = h && v && d;
 
         // check if either X or O has won
         return o && x;
     }
-    
+
     isFull() {
         return Object.keys(this.state.positions).length == BOARD_SIZE * BOARD_SIZE;
     }
